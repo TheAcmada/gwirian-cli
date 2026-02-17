@@ -1,8 +1,8 @@
 # Gwirian CLI
 
-CLI pour l’API [Gwirian](https://www.gwirian.com), avec une interface TUI (terminal) moderne.
+CLI for the [Gwirian](https://www.gwirian.com) API, with a modern terminal (TUI) interface.
 
-## Prérequis
+## Prerequisites
 
 - Node.js >= 18
 
@@ -14,81 +14,81 @@ npm install
 npm run build
 ```
 
-Lancer le binaire :
+Run the binary:
 
 ```bash
 npm start
-# ou
+# or
 node dist/cli.js
 ```
 
-En développement (sans build) :
+During development (no build step):
 
 ```bash
 npm run dev
 ```
 
-### Utiliser la commande `gwirian` partout
+### Using the `gwirian` command everywhere
 
-Pour appeler le CLI avec `gwirian` (sans préfixer par `node` ou `npm start`) :
+To run the CLI as `gwirian` (without prefixing with `node` or `npm start`):
 
-**En développement (lien global)**  
-Depuis la racine du projet :
+**Development (global link)**  
+From the project root:
 
 ```bash
 npm run build
 npm link
 ```
 
-Après ça, la commande `gwirian` est disponible dans tout le terminal. Pour retirer le lien : `npm unlink -g gwirian-cli`.
+After that, the `gwirian` command is available in your terminal. To remove the link: `npm unlink -g gwirian-cli`.
 
-**Installation globale (binaire définitif)**  
-Depuis la racine du projet :
+**Global install (permanent binary)**  
+From the project root:
 
 ```bash
 npm run build
 npm install -g .
 ```
 
-La commande `gwirian` est alors installée globalement (ex. dans le même prefix que ton `node`).
+The `gwirian` command is then installed globally (e.g. in the same prefix as your `node`).
 
 ## Configuration
 
-- **Token** : généré dans Gwirian (workspace member → API token). À saisir une fois via la TUI ou la commande `gwirian auth`.
-- **Base URL** : par défaut `https://www.gwirian.com`. Modifiable dans la TUI de configuration ou avec `gwirian config set base-url <url>`.
+- **Token**: Generated in Gwirian (workspace member → API token). Enter it once via the TUI or the `gwirian auth` command.
+- **Base URL**: Default `https://www.gwirian.com`. Can be changed in the TUI setup or with `gwirian config set base-url <url>`.
 
-Le fichier de configuration est stocké dans :
+The config file is stored at:
 
-- `$XDG_CONFIG_HOME/gwirian-cli/config.json` si `XDG_CONFIG_HOME` est défini ;
-- sinon `~/.config/gwirian-cli/config.json`.
+- `$XDG_CONFIG_HOME/gwirian-cli/config.json` if `XDG_CONFIG_HOME` is set;
+- otherwise `~/.config/gwirian-cli/config.json`.
 
-Le token n’est jamais affiché (y compris dans `config get`).
+The token is never displayed (including in `config get`).
 
-## Utilisation
+## Usage
 
-### Sans argument (TUI)
+### No arguments (TUI)
 
-En terminal interactif :
+In an interactive terminal:
 
 ```bash
 gwirian
 ```
 
-- Si aucun token n’est configuré : formulaire de configuration (token + base URL).
-- Sinon : navigation projets → features → scénarios.
+- If no token is configured: setup form (token + base URL).
+- Otherwise: browse projects → features → scenarios.
 
-### Commandes en ligne de commande
+### Command-line commands
 
-**Auth et configuration**
+**Auth and configuration**
 
-| Commande | Description |
-|----------|-------------|
-| `gwirian auth` | Saisie du token (option `-t` / `--test` pour tester la connexion) |
-| `gwirian logout` | Efface le token |
-| `gwirian config get` | Affiche la base URL et si un token est défini |
-| `gwirian config set base-url <url>` | Définit l’URL de base de l’API |
+| Command | Description |
+|---------|-------------|
+| `gwirian auth` | Prompt for token (use `-t` / `--test` to verify connection) |
+| `gwirian logout` | Clear stored token |
+| `gwirian config get` | Show base URL and whether a token is set |
+| `gwirian config set base-url <url>` | Set API base URL |
 
-**Projets**
+**Projects**
 
 - `gwirian projects list`
 - `gwirian projects show <project-id>`
@@ -101,7 +101,7 @@ gwirian
 - `gwirian features update <project-id> <feature-id> [--title] [--description] [--tag-list]`
 - `gwirian features delete <project-id> <feature-id>`
 
-**Scénarios**
+**Scenarios**
 
 - `gwirian scenarios list <project-id> <feature-id>`
 - `gwirian scenarios show <project-id> <feature-id> <scenario-id>`
@@ -109,7 +109,7 @@ gwirian
 - `gwirian scenarios update <project-id> <feature-id> <scenario-id> [...]`
 - `gwirian scenarios delete <project-id> <feature-id> <scenario-id>`
 
-**Exécutions de scénarios**
+**Scenario executions**
 
 - `gwirian scenario-executions list <project-id> <feature-id> <scenario-id>`
 - `gwirian scenario-executions show <project-id> <feature-id> <scenario-id> <execution-id>`
@@ -117,12 +117,12 @@ gwirian
 - `gwirian scenario-executions update ...`
 - `gwirian scenario-executions delete ...`
 
-**Options globales**
+**Global options**
 
-- `--base-url <url>` : override de l’URL de base pour la commande.
-- `--json` : sortie brute JSON (au lieu du tableau formaté pour les listes/détails).
+- `--base-url <url>`: Override base URL for the command.
+- `--json`: Raw JSON output (instead of formatted tables for list/show).
 
-Exemples :
+Examples:
 
 ```bash
 gwirian --help
@@ -130,6 +130,6 @@ gwirian --json projects list
 gwirian --base-url https://staging.gwirian.com projects list
 ```
 
-## Licence
+## License
 
 MIT.

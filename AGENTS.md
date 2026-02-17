@@ -1,57 +1,57 @@
-# Gwirian CLI – Guide pour agents
+# Gwirian CLI – Guide for agents
 
-Ce fichier décrit le projet **gwirian-cli** pour les assistants et agents qui modifient le code.
+This file describes the **gwirian-cli** project for assistants and agents that modify the codebase.
 
-## Rôle du projet
+## Project role
 
-CLI Node.js qui parle à l’API REST Gwirian (`/api/v1/`). Il propose :
+Node.js CLI that talks to the Gwirian REST API (`/api/v1/`). It provides:
 
-- Une **TUI** (Ink + React + @inkjs/ui) pour configurer token/base URL et naviguer dans projets → features → scénarios.
-- Des **commandes** (Commander) pour auth, config, et tout le CRUD sur projects, features, scenarios, scenario_executions.
+- A **TUI** (Ink + React + @inkjs/ui) to configure token/base URL and browse projects → features → scenarios.
+- **Commands** (Commander) for auth, config, and full CRUD on projects, features, scenarios, and scenario_executions.
 
 ## Stack
 
-- **Runtime** : Node.js >= 18, ESM (`"type": "module"`).
-- **Langage** : TypeScript, compilé en `dist/` avec `tsc`.
-- **CLI** : Commander (sous-commandes, options globales `--base-url`, `--json`).
-- **TUI** : Ink, React, @inkjs/ui (TextInput, PasswordInput, Select, Spinner).
+- **Runtime**: Node.js >= 18, ESM (`"type": "module"`).
+- **Language**: TypeScript, compiled to `dist/` with `tsc`.
+- **CLI**: Commander (subcommands, global options `--base-url`, `--json`).
+- **TUI**: Ink, React, @inkjs/ui (TextInput, PasswordInput, Select, Spinner).
 
-## Structure des fichiers
+## File structure
 
-| Fichier | Rôle |
-|---------|------|
-| `src/cli.ts` | Point d’entrée : parse des args, lance la TUI (si aucun arg + TTY) ou Commander. Définition de toutes les commandes et actions. |
-| `src/config.ts` | Config persistante : `getConfig()`, `setToken()`, `setBaseUrl()`, `clearToken()`, `hasToken()`. Fichier XDG `…/gwirian-cli/config.json`. |
-| `src/api.ts` | Client API : `createApiClient(baseUrl, token)` avec toutes les méthodes (getProjects, getFeatures, createScenario, etc.). Erreurs dédiées : `TokenInvalidOrExpiredError`, `ApiError`. |
-| `src/format.ts` | Sortie : `formatJson()`, `formatList()` pour tableaux en terminal ou JSON. |
-| `src/runTui.ts` | Lancement de la TUI : lit la config, affiche Setup (pas de token) ou Main (liste projets/features/scénarios). |
-| `src/tui/Setup.tsx` | Écran de configuration : PasswordInput (token) puis TextInput (base URL), sauvegarde + test GET projects, exit ou message d’erreur. |
-| `src/tui/Main.tsx` | TUI principale : chargement projets → Select → features → Select → scénarios (affichage given/when/then). |
+| File | Role |
+|------|------|
+| `src/cli.ts` | Entry point: parses args, runs TUI (when no args + TTY) or Commander. Defines all commands and actions. |
+| `src/config.ts` | Persistent config: `getConfig()`, `setToken()`, `setBaseUrl()`, `clearToken()`, `hasToken()`. XDG file `…/gwirian-cli/config.json`. |
+| `src/api.ts` | API client: `createApiClient(baseUrl, token)` with all methods (getProjects, getFeatures, createScenario, etc.). Custom errors: `TokenInvalidOrExpiredError`, `ApiError`. |
+| `src/format.ts` | Output: `formatJson()`, `formatList()`, `formatRichTable()`, `formatError()` for terminal tables, JSON, and styled errors. |
+| `src/runTui.ts` | TUI launcher: reads config, shows Setup (no token) or Main (projects/features/scenarios list). |
+| `src/tui/Setup.tsx` | Setup screen: PasswordInput (token) then TextInput (base URL), save + test GET projects, exit or error message. |
+| `src/tui/Main.tsx` | Main TUI: load projects → Select → features → Select → scenarios (show given/when/then). |
 
-Binaire exposé : `dist/cli.js` (après `npm run build`). Script dev : `npm run dev` (tsx sur `src/cli.ts`).
+Exposed binary: `dist/cli.js` (after `npm run build`). Dev script: `npm run dev` (tsx on `src/cli.ts`).
 
 ## Conventions
 
-- **Imports** : extensions `.js` pour les modules locaux (sortie ESM vers `dist/*.js`).
-- **Config** : ne jamais logger ni afficher le token. Fichier config en `0o600`, répertoire parent en `0o700`.
-- **API** : corps des requêtes POST/PATCH au format attendu par Rails (p.ex. `{ feature: { title, description } }`). Voir `src/api.ts`.
-- **TUI** : utilisée uniquement quand `args.length === 0` et `process.stdin.isTTY` ; sinon affichage de l’aide.
+- **Imports**: Use `.js` extensions for local modules (ESM output to `dist/*.js`).
+- **Config**: Never log or display the token. Config file mode `0o600`, parent directory `0o700`.
+- **API**: POST/PATCH bodies in the format expected by Rails (e.g. `{ feature: { title, description } }`). See `src/api.ts`.
+- **TUI**: Only used when `args.length === 0` and `process.stdin.isTTY`; otherwise help is shown.
 
-## Où modifier quoi
+## Where to change what
 
-- **Nouvelle commande ou sous-commande** : `src/cli.ts` (program / .command / .addCommand / .action). Utiliser `requireToken()` et `createApiClient()` pour les commandes qui appellent l’API.
-- **Nouvel endpoint ou champ API** : `src/api.ts` (méthodes et types). Adapter les types et les wrappers (feature, scenario, scenario_execution) si le backend change.
-- **Comportement de la config** : `src/config.ts` (chemins, champs du JSON, permissions).
-- **Écrans TUI** : `src/tui/Setup.tsx`, `src/tui/Main.tsx`. Nouveaux écrans : les ajouter dans `runTui.ts` ou depuis `Main.tsx` (navigation par état).
-- **Format d’affichage (listes, JSON)** : `src/format.ts` et les appels à `output()` dans les actions Commander.
+- **New command or subcommand**: `src/cli.ts` (program / .command / .addCommand / .action). Use `requireToken()` and `createApiClient()` for commands that call the API.
+- **New API endpoint or field**: `src/api.ts` (methods and types). Update types and wrappers (feature, scenario, scenario_execution) if the backend changes.
+- **Config behaviour**: `src/config.ts` (paths, JSON fields, permissions).
+- **TUI screens**: `src/tui/Setup.tsx`, `src/tui/Main.tsx`. New screens: add them in `runTui.ts` or from `Main.tsx` (state-based navigation).
+- **Output format (lists, JSON, errors)**: `src/format.ts` and calls to `output()` in Commander actions.
 
-## Tests et build
+## Tests and build
 
-- `npm run build` : compile TypeScript → `dist/`.
-- `npm start` : `node dist/cli.js`.
-- Pas de suite de tests pour l’instant ; les commandes peuvent être testées à la main (p.ex. `gwirian config get`, `gwirian --help`).
+- `npm run build`: Compile TypeScript → `dist/`.
+- `npm start`: `node dist/cli.js`.
+- No test suite yet; commands can be tested manually (e.g. `gwirian config get`, `gwirian --help`).
 
-## API Gwirian (rappel)
+## Gwirian API (reminder)
 
-- Base : `GET/POST /api/v1/projects`, `GET /api/v1/projects/:id`, puis features et scenarios sous `projects/:id/features`, `.../scenarios`, `.../scenario_executions`.
-- Auth : header `Authorization: Bearer <token>` (token du WorkspaceMember). 401 → token invalide ou expiré.
+- Base: `GET/POST /api/v1/projects`, `GET /api/v1/projects/:id`, then features and scenarios under `projects/:id/features`, `.../scenarios`, `.../scenario_executions`.
+- Auth: `Authorization: Bearer <token>` header (WorkspaceMember token). 401 → token invalid or expired.

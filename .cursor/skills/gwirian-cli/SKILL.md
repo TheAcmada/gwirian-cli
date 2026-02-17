@@ -12,7 +12,7 @@ Run the **gwirian** CLI to talk to the Gwirian API from the terminal. Use this s
 - User asks to list projects, features, scenarios, or scenario executions from the terminal
 - User wants to create/update/delete a feature, scenario, or scenario execution via CLI
 - User wants to set or check the API token or base URL for the CLI
-- User says "avec le CLI gwirian", "via gwirian", "commande gwirian", or similar
+- User says "with the gwirian CLI", "via gwirian", "gwirian command", or similar
 - You need to automate Gwirian API calls in a script and the CLI is available
 
 ## How to run
