@@ -1,6 +1,6 @@
 # Gwirian CLI
 
-CLI for the [Gwirian](https://www.gwirian.com) API, with a modern terminal (TUI) interface.
+[Gwirian](https://www.gwirian.com) is a platform for managing BDD scenarios and feature tests. This CLI lets you use the Gwirian API from the terminal with a modern TUI (projects, features, scenarios, and scenario executions).
 
 ## Prerequisites
 

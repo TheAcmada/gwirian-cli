@@ -37,5 +37,13 @@
     "dist",
     "bin",
     "README.md"
-  ]
+  ],
+  "homepage": "https://github.com/acmada/gwirian-cli#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/acmada/gwirian-cli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/acmada/gwirian-cli/issues"
+  }
 }
