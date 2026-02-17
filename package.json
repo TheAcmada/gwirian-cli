@@ -38,12 +38,12 @@
     "bin",
     "README.md"
   ],
-  "homepage": "https://github.com/acmada/gwirian-cli#readme",
+  "homepage": "https://github.com/TheAcmada/gwirian-cli#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/acmada/gwirian-cli.git"
+    "url": "git+https://github.com/TheAcmada/gwirian-cli.git"
   },
   "bugs": {
-    "url": "https://github.com/acmada/gwirian-cli/issues"
+    "url": "https://github.com/TheAcmada/gwirian-cli/issues"
   }
 }
