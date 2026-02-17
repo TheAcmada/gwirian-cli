@@ -6,7 +6,36 @@ CLI for the [Gwirian](https://www.gwirian.com) API, with a modern terminal (TUI)
 
 - Node.js >= 18
 
-## Installation
+## Quick start (install from npm)
+
+Install the CLI globally:
+
+```bash
+npm install -g gwirian-cli
+```
+
+Configure your API token (get it from Gwirian: workspace → API token):
+
+```bash
+gwirian auth
+```
+
+Optionally test the connection:
+
+```bash
+gwirian auth --test
+```
+
+Then run the TUI or any command:
+
+```bash
+gwirian
+# or
+gwirian projects list
+gwirian --help
+```
+
+## Installation (from source)
 
 ```bash
 cd gwirian-cli
