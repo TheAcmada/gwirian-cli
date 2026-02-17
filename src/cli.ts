@@ -1,7 +1,7 @@
 import { createInterface } from 'readline';
 import { createApiClient, TokenInvalidOrExpiredError, ApiError } from './api.js';
 import { getConfig, setToken, setBaseUrl, clearToken, hasToken } from './config.js';
-import { formatJson, formatList } from './format.js';
+import { formatJson, formatList, formatRichTable, formatError } from './format.js';
 import type { CreateFeatureBody, UpdateFeatureBody } from './api.js';
 import type { CreateScenarioBody, UpdateScenarioBody } from './api.js';
 import type { CreateScenarioExecutionBody, UpdateScenarioExecutionBody } from './api.js';
@@ -9,6 +9,17 @@ import { program } from 'commander';
 
 const AUTH_REQUIRED_MSG =
   'No token configured. Run "gwirian auth" to set your API token.';
+
+function printError(
+  message: string,
+  options: { title?: string; statusCode?: number } = {}
+): void {
+  if (process.stderr.isTTY) {
+    console.error(formatError(message, options));
+  } else {
+    console.error(message);
+  }
+}
 
 function getBaseUrlAndToken(baseUrlOverride?: string): {
   baseUrl: string;
@@ -27,7 +38,7 @@ function requireToken(baseUrlOverride?: string): {
 } {
   const { baseUrl, token } = getBaseUrlAndToken(baseUrlOverride);
   if (!token) {
-    console.error(AUTH_REQUIRED_MSG);
+    printError(AUTH_REQUIRED_MSG, { title: 'Auth required' });
     process.exit(1);
   }
   return { baseUrl, token };
@@ -49,10 +60,11 @@ function output(data: unknown, useJson: boolean, listColumns?: string[]): void {
     return;
   }
   if (Array.isArray(data) && listColumns && listColumns.length > 0) {
-    const table = formatList(
-      data as Record<string, unknown>[],
-      listColumns
-    );
+    const items = data as Record<string, unknown>[];
+    const table =
+      process.stdout.isTTY && items.length > 0
+        ? formatRichTable(items, listColumns)
+        : formatList(items, listColumns);
     if (table) console.log(table);
     return;
   }
@@ -77,7 +89,7 @@ program
   .action(async (opts: { test?: boolean }) => {
     const token = await ask('Token: ');
     if (!token) {
-      console.error('Token cannot be empty.');
+      printError('Token cannot be empty.', { title: 'Auth' });
       process.exit(1);
     }
     setToken(token);
@@ -89,9 +101,9 @@ program
         console.log('Connection successful.');
       } catch (e) {
         if (e instanceof TokenInvalidOrExpiredError) {
-          console.error('Token is invalid or expired.');
+          printError('Token is invalid or expired.', { title: 'Auth' });
         } else {
-          console.error('Connection failed:', (e as Error).message);
+          printError(`Connection failed: ${(e as Error).message}`, { title: 'Connection failed' });
         }
         process.exit(1);
       }
@@ -150,14 +162,7 @@ program
           const projects = await api.getProjects();
           output(projects, useJson, ['id', 'name', 'description']);
         } catch (e) {
-          if (e instanceof TokenInvalidOrExpiredError) {
-            console.error('Token invalid or expired. Run "gwirian auth" to set a new token.');
-          } else if (e instanceof ApiError) {
-            console.error(e.message);
-          } else {
-            console.error((e as Error).message);
-          }
-          process.exit(1);
+          handleApiError(e);
         }
       })
   )
@@ -176,25 +181,19 @@ program
           const project = await api.getProject(projectId);
           output(project, useJson);
         } catch (e) {
-          if (e instanceof TokenInvalidOrExpiredError) {
-            console.error('Token invalid or expired. Run "gwirian auth" to set a new token.');
-          } else if (e instanceof ApiError) {
-            console.error(e.message);
-          } else {
-            console.error((e as Error).message);
-          }
-          process.exit(1);
+          handleApiError(e);
         }
       })
   );
 
 function handleApiError(e: unknown): void {
   if (e instanceof TokenInvalidOrExpiredError) {
-    console.error('Token invalid or expired. Run "gwirian auth" to set a new token.');
+    printError('Token invalid or expired. Run "gwirian auth" to set a new token.', { title: 'Auth' });
   } else if (e instanceof ApiError) {
-    console.error(e.message);
+    const title = e.statusCode === 404 ? 'Not found' : e.statusCode === 403 ? 'Forbidden' : 'Error';
+    printError(e.message, { title, statusCode: e.statusCode });
   } else {
-    console.error((e as Error).message);
+    printError((e as Error).message, { title: 'Error' });
   }
   process.exit(1);
 }
