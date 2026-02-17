@@ -1,7 +1,7 @@
 import { createInterface } from 'readline';
 import { createApiClient, TokenInvalidOrExpiredError, ApiError } from './api.js';
 import { getConfig, setToken, setBaseUrl, clearToken, hasToken } from './config.js';
-import { formatJson, formatList, formatRichTable, formatError } from './format.js';
+import { formatJson, formatList, formatRichTable, formatError, type RichTableOptions } from './format.js';
 import type { CreateFeatureBody, UpdateFeatureBody } from './api.js';
 import type { CreateScenarioBody, UpdateScenarioBody } from './api.js';
 import type { CreateScenarioExecutionBody, UpdateScenarioExecutionBody } from './api.js';
@@ -54,7 +54,12 @@ function ask(question: string): Promise<string> {
   });
 }
 
-function output(data: unknown, useJson: boolean, listColumns?: string[]): void {
+function output(
+  data: unknown,
+  useJson: boolean,
+  listColumns?: string[],
+  tableOptions?: RichTableOptions
+): void {
   if (useJson) {
     console.log(formatJson(data));
     return;
@@ -63,7 +68,7 @@ function output(data: unknown, useJson: boolean, listColumns?: string[]): void {
     const items = data as Record<string, unknown>[];
     const table =
       process.stdout.isTTY && items.length > 0
-        ? formatRichTable(items, listColumns)
+        ? formatRichTable(items, listColumns, tableOptions ?? {})
         : formatList(items, listColumns);
     if (table) console.log(table);
     return;
@@ -216,7 +221,10 @@ program
         try {
           const api = createApiClient(baseUrl, token);
           const list = await api.getScenarios(projectId, featureId);
-          output(list, useJson, ['id', 'title', 'given', 'when', 'then']);
+          output(list, useJson, ['id', 'title', 'given', 'when', 'then'], {
+            wordWrap: true,
+            colWidths: [6, 26, 28, 28, 28],
+          });
         } catch (e) {
           handleApiError(e);
         }

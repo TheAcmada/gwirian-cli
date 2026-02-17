@@ -12,15 +12,35 @@ function columnLabel(col: string): string {
     .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
+export interface RichTableOptions {
+  /** Enable word wrap in cells (no truncation); use with colWidths for long text. */
+  wordWrap?: boolean;
+  /** Fixed column widths when wordWrap is true (e.g. [6, 30, 36, 36, 36] for id, title, given, when, then). */
+  colWidths?: number[];
+}
+
 /** Rich terminal table with borders and colors (for TTY). */
 export function formatRichTable(
   items: Record<string, unknown>[],
-  columns: string[]
+  columns: string[],
+  options: RichTableOptions = {}
 ): string {
   if (items.length === 0) return chalk.dim('(no rows)');
-  const maxCell = 50;
+  const { wordWrap = false, colWidths: fixedColWidths } = options;
+  const maxCell = wordWrap ? 200 : 50;
+  const colWidths =
+    fixedColWidths ??
+    columns.map((col) => {
+      const max = Math.max(
+        columnLabel(col).length,
+        ...items.map((r) => String(r[col] ?? '').length)
+      );
+      return Math.min(Math.max(max + 2, 6), maxCell + 2);
+    });
   const table = new TableConstructor({
     head: columns.map((c) => chalk.bold.cyan(columnLabel(c))),
+    wordWrap,
+    wrapOnWordBoundary: true,
     chars: {
       'top': '─',
       'top-mid': '┬',
@@ -44,19 +64,13 @@ export function formatRichTable(
       border: ['cyan'],
       compact: false,
     },
-    colWidths: columns.map((col) => {
-      const max = Math.max(
-        columnLabel(col).length,
-        ...items.map((r) => String(r[col] ?? '').length)
-      );
-      return Math.min(Math.max(max + 2, 6), maxCell + 2);
-    }),
+    colWidths,
   });
   for (const r of items) {
     table.push(
       columns.map((col) => {
         let v = String(r[col] ?? '');
-        if (v.length > maxCell) v = v.slice(0, maxCell - 2) + '…';
+        if (!wordWrap && v.length > maxCell) v = v.slice(0, maxCell - 2) + '…';
         return v;
       })
     );
