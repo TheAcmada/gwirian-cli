@@ -84,7 +84,7 @@ The `gwirian` command is then installed globally (e.g. in the same prefix as you
 ## Configuration
 
 - **Token**: Generated in Gwirian (workspace member → API token). Enter it once via the TUI or the `gwirian auth` command.
-- **Base URL**: Default `https://www.gwirian.com`. Can be changed in the TUI setup or with `gwirian config set base-url <url>`.
+- **Base URL**: Default `https://app.gwirian.com`. Can be changed in the TUI setup or with `gwirian config set base-url <url>`.
 
 The config file is stored at:
 

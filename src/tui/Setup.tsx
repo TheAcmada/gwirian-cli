@@ -5,7 +5,7 @@ import { setToken as saveToken, setBaseUrl } from '../config.js';
 import { createApiClient } from '../api.js';
 import { TokenInvalidOrExpiredError } from '../api.js';
 
-const DEFAULT_BASE_URL = 'https://www.gwirian.com';
+const DEFAULT_BASE_URL = 'https://app.gwirian.com';
 
 export function SetupApp() {
   const [step, setStep] = useState<'token' | 'baseUrl' | 'done'>('token');

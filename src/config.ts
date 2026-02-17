@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 
-const DEFAULT_BASE_URL = 'https://www.gwirian.com';
+const DEFAULT_BASE_URL = 'https://app.gwirian.com';
 
 export interface ConfigData {
   token: string | null;

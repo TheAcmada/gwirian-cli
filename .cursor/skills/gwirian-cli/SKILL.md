@@ -32,7 +32,7 @@ Run the **gwirian** CLI to talk to the Gwirian API from the terminal. Use this s
 | `gwirian auth` | Prompt for token and save it; use `-t` or `--test` to validate with GET projects |
 | `gwirian logout` | Clear stored token |
 | `gwirian config get` | Print base URL and whether a token is set |
-| `gwirian config set base-url <url>` | Set API base URL (default https://www.gwirian.com) |
+| `gwirian config set base-url <url>` | Set API base URL (default https://app.gwirian.com) |
 
 ## Projects
 
