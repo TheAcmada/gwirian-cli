@@ -11,7 +11,7 @@ CLI for the [Gwirian](https://www.gwirian.com) API, with a modern terminal (TUI)
 Install the CLI globally:
 
 ```bash
-npm install -g gwirian-cli
+npm install -g @acmada/gwirian-cli
 ```
 
 Configure your API token (get it from Gwirian: workspace → API token):
@@ -69,7 +69,7 @@ npm run build
 npm link
 ```
 
-After that, the `gwirian` command is available in your terminal. To remove the link: `npm unlink -g gwirian-cli`.
+After that, the `gwirian` command is available in your terminal. To remove the link: `npm unlink -g @acmada/gwirian-cli`.
 
 **Global install (permanent binary)**  
 From the project root:
