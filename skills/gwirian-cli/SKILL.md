@@ -24,6 +24,8 @@ Use the **gwirian** CLI to talk to the Gwirian API from the terminal. This skill
 
 Use `--json` when you need structured output (e.g. to parse project context or IDs).
 
+**Installing the skill:** After installing the CLI, run `gwirian install --skills` to copy this skill into `.cursor/skills/gwirian-cli` and/or `.claude/skills/gwirian-cli` (so Cursor or Claude Code can use it). Use `--target cursor` or `--target claude` to install for one only; use `--global` to install in your home directory. See the reference for full options.
+
 ## Task-oriented usage
 
 ### 1. Configure auth

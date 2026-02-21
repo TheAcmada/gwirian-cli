@@ -11,6 +11,20 @@ This file lists all **gwirian** commands for use by agents. Run from the gwirian
 
 ---
 
+## Install (skills)
+
+| Command | Description |
+|---------|-------------|
+| `gwirian install --skills` | Install the gwirian-cli skill for Cursor and Claude (into `.cursor/skills/gwirian-cli` and `.claude/skills/gwirian-cli` in the current directory) |
+| `gwirian install --skills --target cursor` | Install only into `.cursor/skills/gwirian-cli` |
+| `gwirian install --skills --target claude` | Install only into `.claude/skills/gwirian-cli` |
+| `gwirian install --skills --target both` | Same as default (both targets) |
+| `gwirian install --skills --global` | Install into user home: `~/.cursor/skills/gwirian-cli` and/or `~/.claude/skills/gwirian-cli` |
+
+**Options:** `--target <cursor|claude|both>` (default: `both`), `-g` / `--global` (install in home instead of current directory).
+
+---
+
 ## Auth and config
 
 | Command | Description |

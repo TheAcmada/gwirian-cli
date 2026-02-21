@@ -35,6 +35,28 @@ gwirian projects list
 gwirian --help
 ```
 
+### Installing skills
+
+Cursor and Claude Code can use the gwirian-cli skill so the agent knows how to run the CLI and manage features/scenarios. Install the skill with:
+
+```bash
+gwirian install --skills
+```
+
+This copies the skill into `.cursor/skills/gwirian-cli` and `.claude/skills/gwirian-cli` in the current directory. Options:
+
+- `--target cursor` — install only for Cursor (`.cursor/skills/gwirian-cli`)
+- `--target claude` — install only for Claude (`.claude/skills/gwirian-cli`)
+- `--target both` — install for both (default)
+- `--global` (or `-g`) — install in your home directory (`~/.cursor/skills/gwirian-cli` and/or `~/.claude/skills/gwirian-cli`)
+
+Examples:
+
+```bash
+gwirian install --skills --target cursor
+gwirian install --skills --global
+```
+
 ## Installation (from source)
 
 ```bash
@@ -116,6 +138,12 @@ gwirian
 | `gwirian logout` | Clear stored token |
 | `gwirian config get` | Show base URL and whether a token is set |
 | `gwirian config set base-url <url>` | Set API base URL |
+
+**Install**
+
+| Command | Description |
+|---------|-------------|
+| `gwirian install --skills` | Install gwirian-cli skill for Cursor and/or Claude (use `--target cursor|claude|both`, `--global`) |
 
 **Projects**
 

@@ -1,4 +1,8 @@
 import { createInterface } from 'readline';
+import { cpSync, existsSync, mkdirSync } from 'fs';
+import { dirname, join } from 'path';
+import { homedir } from 'os';
+import { fileURLToPath } from 'url';
 import { createApiClient, TokenInvalidOrExpiredError, ApiError } from './api.js';
 import { getConfig, setToken, setBaseUrl, clearToken, hasToken } from './config.js';
 import { formatJson, formatList, formatRichTable, formatError, type RichTableOptions } from './format.js';
@@ -6,6 +10,19 @@ import type { CreateFeatureBody, UpdateFeatureBody } from './api.js';
 import type { CreateScenarioBody, UpdateScenarioBody } from './api.js';
 import type { CreateScenarioExecutionBody, UpdateScenarioExecutionBody } from './api.js';
 import { program } from 'commander';
+
+const SKILL_NAME = 'gwirian-cli';
+const VALID_TARGETS = ['cursor', 'claude', 'both'] as const;
+type InstallTarget = (typeof VALID_TARGETS)[number];
+
+function getPackageRoot(): string {
+  const currentFile = fileURLToPath(import.meta.url);
+  return dirname(dirname(currentFile));
+}
+
+function getSkillsSourceDir(): string {
+  return join(getPackageRoot(), 'skills', SKILL_NAME);
+}
 
 const AUTH_REQUIRED_MSG =
   'No token configured. Run "gwirian auth" to set your API token.';
@@ -148,6 +165,48 @@ program
           })
       )
   );
+
+program
+  .command('install')
+  .description('Install gwirian-cli skill for Cursor and/or Claude')
+  .option('--skills', 'Install the gwirian-cli skill')
+  .option('-t, --target <cursor|claude|both>', 'Target directory: .cursor, .claude, or both (default: both)', 'both')
+  .option('-g, --global', 'Install to user global skills dir (~/.cursor/skills and/or ~/.claude/skills)')
+  .action((opts: { skills?: boolean; target?: string; global?: boolean }) => {
+    if (!opts.skills) {
+      console.log('Use --skills to install the gwirian-cli skill.');
+      return;
+    }
+    const target = (opts.target ?? 'both').toLowerCase();
+    if (!VALID_TARGETS.includes(target as InstallTarget)) {
+      printError(
+        `Invalid --target "${opts.target}". Use one of: ${VALID_TARGETS.join(', ')}.`,
+        { title: 'Install' }
+      );
+      process.exit(1);
+    }
+    const sourceDir = getSkillsSourceDir();
+    if (!existsSync(sourceDir)) {
+      printError(
+        'Skill files not found. Run from the gwirian-cli package root or reinstall the package.',
+        { title: 'Install' }
+      );
+      process.exit(1);
+    }
+    const baseDir = opts.global ? homedir() : process.cwd();
+    const destinations: { dir: string; label: string }[] = [];
+    if (target === 'cursor' || target === 'both') {
+      destinations.push({ dir: join(baseDir, '.cursor', 'skills', SKILL_NAME), label: '.cursor/skills/gwirian-cli' });
+    }
+    if (target === 'claude' || target === 'both') {
+      destinations.push({ dir: join(baseDir, '.claude', 'skills', SKILL_NAME), label: '.claude/skills/gwirian-cli' });
+    }
+    for (const { dir, label } of destinations) {
+      mkdirSync(dirname(dir), { recursive: true });
+      cpSync(sourceDir, dir, { recursive: true });
+      console.log(`Skill installed to ${label}`);
+    }
+  });
 
 // Projects
 program

@@ -36,6 +36,7 @@
   "files": [
     "dist",
     "bin",
+    "skills",
     "README.md"
   ],
   "homepage": "https://github.com/TheAcmada/gwirian-cli#readme",
