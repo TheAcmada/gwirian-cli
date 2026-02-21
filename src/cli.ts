@@ -439,6 +439,7 @@ program
       .option('--status <status>', 'Status')
       .option('--notes <notes>', 'Notes')
       .option('--executed-at <iso>', 'Executed at (ISO date)')
+      .option('--tag-list <list>', 'Comma-separated tags (e.g. e2e, v1.2.3, bugfix-123)')
       .action(async (projectId: string, featureId: string, scenarioId: string, opts: CreateScenarioExecutionBody) => {
         const { baseUrl, token } = requireToken(
           (program as unknown as { _baseUrlOverride?: string })._baseUrlOverride
@@ -464,6 +465,7 @@ program
       .option('--status <status>', 'Status')
       .option('--notes <notes>', 'Notes')
       .option('--executed-at <iso>', 'Executed at (ISO date)')
+      .option('--tag-list <list>', 'Comma-separated tags (e.g. e2e, v1.2.3, bugfix-123)')
       .action(async (projectId: string, featureId: string, scenarioId: string, executionId: string, opts: UpdateScenarioExecutionBody) => {
         const { baseUrl, token } = requireToken(
           (program as unknown as { _baseUrlOverride?: string })._baseUrlOverride

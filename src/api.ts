@@ -52,6 +52,7 @@ export interface ScenarioExecution {
   status: string | null;
   notes: string | null;
   executed_at: string | null;
+  tag_list?: string[];
   created_at: string;
   updated_at: string;
 }
@@ -88,12 +89,14 @@ export interface CreateScenarioExecutionBody {
   status?: string;
   notes?: string;
   executed_at?: string;
+  tag_list?: string;
 }
 
 export interface UpdateScenarioExecutionBody {
   status?: string;
   notes?: string;
   executed_at?: string;
+  tag_list?: string;
 }
 
 export function createApiClient(baseUrl: string, token: string) {
