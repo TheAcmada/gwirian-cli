@@ -46,7 +46,7 @@ Config file: `~/.config/gwirian-cli/config.json` (or `$XDG_CONFIG_HOME/gwirian-c
 | `gwirian projects list` | List all projects |
 | `gwirian projects show <project-id>` | Show one project (includes `context` when present) |
 
-**Project context:** The API may return a `context` attribute on the project. It can contain accounts to use, environments and their URLs, and other execution hints. When executing scenarios, always fetch the project with `gwirian projects show <project-id> --json` and read `context` before running tests.
+**Project context (required for scenario execution):** The API returns a `context` attribute on the project (environments/URLs, accounts, logins, etc.). **When executing scenarios, you must always** fetch the project with `gwirian projects show <project-id> --json`, read `context`, and use it to run the tests (URLs, accounts). Do not run scenario execution without using the project context.
 
 ---
 

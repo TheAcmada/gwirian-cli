@@ -5,7 +5,9 @@ description: Runs and composes commands for the Gwirian CLI (gwirian) to interac
 
 # Gwirian CLI skill
 
-Use the **gwirian** CLI to talk to the Gwirian API from the terminal. This skill supports **managing** features and scenarios (create, update, delete), **listing** projects/features/scenarios for context, and **recording** scenario executions when running tests with another tool (e.g. Playwright). For execution flows, always read the project’s **context** for accounts, environments, and URLs.
+Use the **gwirian** CLI to talk to the Gwirian API from the terminal. This skill supports **managing** features and scenarios (create, update, delete), **listing** projects/features/scenarios for context, and **recording** scenario executions when running tests with another tool (e.g. Playwright).
+
+**Rule: when executing scenarios, you must always use the project context.** Before running any scenario (e.g. with Playwright), fetch the project with `gwirian projects show <project-id> --json`, read the **`context`** attribute (environments, URLs, accounts, logins), and use that information to run the tests. Do not execute scenarios without having fetched and applied the project context.
 
 ## When to use
 
@@ -70,20 +72,19 @@ Use these to resolve IDs and to **get project context** before executing scenari
 
 When the user wants to **execute one or more scenarios**:
 
-1. **Always fetch project context first.**  
-   Run `gwirian projects show <project-id> --json` and read the **`context`** attribute. The context can contain:
-   - Accounts to use (e.g. test users, credentials or magic-link emails)
-   - Environments and their base URLs (e.g. local, staging, production)
-   - Any other hints needed to run the scenarios (e.g. roles, feature flags)
+1. **You must always fetch and use project context.**  
+   Run `gwirian projects show <project-id> --json` and read the **`context`** attribute. Use it for:
+   - **Environments and URLs** — base URL(s) to navigate to (e.g. local, staging, production)
+   - **Accounts** — test users, logins, or magic-link emails to use
+   - Any other hints (roles, feature flags, etc.)  
+   Do not run scenario execution without having read and applied this context. If the project has no `context` or it is empty, ask the user for environment URL and test account details before running tests, or clearly note that context was missing.
 
-2. **Resolve features and scenarios** with the CLI (e.g. `features list`, `scenarios list`) and use the project context to choose environment and accounts.
+2. **Resolve features and scenarios** with the CLI (e.g. `features list`, `scenarios list`). Use the project context to select environment and accounts for the run.
 
 3. **Run the actual tests** with the other tool (e.g. Playwright skill or Playwright MCP): navigate to the URLs from context, use accounts from context, perform the steps implied by each scenario’s title/given/when/then.
 
 4. **Record each execution** with the CLI:  
    `gwirian scenario-executions create <project-id> <feature-id> <scenario-id> --status passed|failed|pending [--executed-at <ISO>] [--notes "..."]`
-
-If the API does not return a `context` field, proceed with user-provided or default environment/account information and note that project context was missing.
 
 ### 5. List or record scenario executions
 
