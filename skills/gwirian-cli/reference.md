@@ -45,6 +45,7 @@ Config file: `~/.config/gwirian-cli/config.json` (or `$XDG_CONFIG_HOME/gwirian-c
 |---------|-------------|
 | `gwirian projects list` | List all projects |
 | `gwirian projects show <project-id>` | Show one project; response includes `context` when present |
+| `gwirian projects search <project-id> <query> [--limit <n>]` | Search within a project for features and scenarios (optional `--limit`, default 20) |
 
 ---
 

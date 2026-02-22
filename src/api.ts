@@ -24,6 +24,17 @@ export interface Project {
   updated_at: string;
 }
 
+export interface SearchResult {
+  type: 'feature' | 'scenario';
+  id: number;
+  title: string;
+  description?: string | null;
+  project_id?: number;
+  feature_id?: number;
+  feature_title?: string;
+  status?: string;
+}
+
 export interface Feature {
   id: number;
   title: string;
@@ -151,6 +162,15 @@ export function createApiClient(baseUrl: string, token: string) {
     },
     getProject(projectId: string | number): Promise<Project> {
       return request<Project>('GET', `/projects/${projectId}`);
+    },
+    searchProject(
+      projectId: string | number,
+      query: string,
+      limit?: number
+    ): Promise<{ results: SearchResult[] }> {
+      let path = `/projects/${projectId}/search?q=${encodeURIComponent(query)}`;
+      if (limit != null) path += `&limit=${limit}`;
+      return request<{ results: SearchResult[] }>('GET', path);
     },
 
     // Features

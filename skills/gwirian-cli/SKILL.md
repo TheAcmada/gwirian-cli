@@ -52,6 +52,7 @@ Use these to resolve IDs and to **get project context** before executing scenari
 |------|---------|
 | List projects | `gwirian projects list` (use `--json` to parse) |
 | Show project (includes context) | `gwirian projects show <project-id>` (use `--json` to read `context`) |
+| Search project (features & scenarios) | `gwirian projects search <project-id> <query>` (optional `--limit <n>`) |
 | List features | `gwirian features list <project-id>` |
 | Show feature | `gwirian features show <project-id> <feature-id>` |
 | List scenarios | `gwirian scenarios list <project-id> <feature-id>` |
@@ -107,6 +108,9 @@ gwirian --json projects list
 
 # Get project details including context (required before executing scenarios)
 gwirian --json projects show 1
+
+# Search within a project for features and scenarios
+gwirian projects search 1 "login"
 
 # Create a feature
 gwirian features create 1 --title "Login" --description "User can sign in"

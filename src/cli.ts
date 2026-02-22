@@ -211,7 +211,7 @@ program
 // Projects
 program
   .command('projects')
-  .description('List or show projects')
+  .description('List, show, or search projects')
   .addCommand(
     program
       .createCommand('list')
@@ -244,6 +244,29 @@ program
           const api = createApiClient(baseUrl, token);
           const project = await api.getProject(projectId);
           output(project, useJson);
+        } catch (e) {
+          handleApiError(e);
+        }
+      })
+  )
+  .addCommand(
+    program
+      .createCommand('search')
+      .description('Search within a project for features and scenarios')
+      .argument('<project-id>', 'Project ID')
+      .argument('<query>', 'Search query')
+      .option('--limit <n>', 'Max results per type (default 20)', parseInt)
+      .action(async (projectId: string, query: string, opts: { limit?: number }) => {
+        const { baseUrl, token } = requireToken(
+          (program as unknown as { _baseUrlOverride?: string })._baseUrlOverride
+        );
+        const useJson = (program as unknown as { _useJson?: boolean })._useJson ?? false;
+        try {
+          const api = createApiClient(baseUrl, token);
+          const { results } = await api.searchProject(projectId, query, opts.limit);
+          output(results, useJson, ['type', 'id', 'title', 'feature_title', 'status'], {
+            wordWrap: true,
+          });
         } catch (e) {
           handleApiError(e);
         }

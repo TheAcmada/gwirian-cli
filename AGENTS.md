@@ -8,7 +8,7 @@ Node.js CLI that talks to the Gwirian REST API (`/api/v1/`). It provides:
 
 - A **TUI** (Ink + React + @inkjs/ui) to configure token/base URL and browse projects → features → scenarios.
 - **Commands** (Commander) for auth, config, skill install, and CRUD:
-  - **Projects**: list, show (no create/update/delete).
+  - **Projects**: list, show, search (no create/update/delete).
   - **Features, scenarios, scenario_executions**: full CRUD.
 
 ## Stack
@@ -25,7 +25,7 @@ Node.js CLI that talks to the Gwirian REST API (`/api/v1/`). It provides:
 |------|------|
 | `src/cli.ts` | Entry point: parses args; if no args and TTY runs TUI, else Commander. Defines `requireToken()`, `getBaseUrlAndToken()`, `output()`, `handleApiError()`, `printError()`, `ask()`. All commands and their actions. |
 | `src/config.ts` | Config dir: `$XDG_CONFIG_HOME/gwirian-cli` or `~/.config/gwirian-cli`; file `config.json`. `getConfig()`, `setToken()`, `setBaseUrl()`, `clearToken()`, `hasToken()`. Default base URL `https://app.gwirian.com`. Writes with mode `0o600`, directory `0o700`. |
-| `src/api.ts` | API client: `createApiClient(baseUrl, token)`. Types: `Project`, `Feature`, `Scenario`, `ScenarioExecution`, `CreateFeatureBody`, `UpdateFeatureBody`, `CreateScenarioBody`, `UpdateScenarioBody`, `CreateScenarioExecutionBody`, `UpdateScenarioExecutionBody`. Errors: `TokenInvalidOrExpiredError`, `ApiError` (statusCode, body). Methods: getProjects, getProject; getFeatures, getFeature, createFeature, updateFeature, deleteFeature; getScenarios, getScenario, createScenario, updateScenario, deleteScenario; getScenarioExecutions, getScenarioExecution, createScenarioExecution, updateScenarioExecution, deleteScenarioExecution. |
+| `src/api.ts` | API client: `createApiClient(baseUrl, token)`. Types: `Project`, `SearchResult`, `Feature`, `Scenario`, `ScenarioExecution`, `CreateFeatureBody`, `UpdateFeatureBody`, `CreateScenarioBody`, `UpdateScenarioBody`, `CreateScenarioExecutionBody`, `UpdateScenarioExecutionBody`. Errors: `TokenInvalidOrExpiredError`, `ApiError` (statusCode, body). Methods: getProjects, getProject, searchProject; getFeatures, getFeature, createFeature, updateFeature, deleteFeature; getScenarios, getScenario, createScenario, updateScenario, deleteScenario; getScenarioExecutions, getScenarioExecution, createScenarioExecution, updateScenarioExecution, deleteScenarioExecution. |
 | `src/format.ts` | `formatJson()`, `formatList()`, `formatRichTable()` (options: `wordWrap`, `colWidths`), `formatError(message, { title?, statusCode? })`. Uses chalk and cli-table3. |
 | `src/runTui.ts` | Reads config; if no token renders `SetupApp`, else renders `MainApp` with `baseUrl` and `token`. |
 | `src/tui/Setup.tsx` | Setup: PasswordInput (token) → TextInput (base URL) → save token and base URL, test `getProjects()`, exit on success or show error. |
@@ -50,6 +50,7 @@ In `skills/gwirian-cli/` you will find the documents intended for agents. They m
 - **install** — Requires `--skills`. Options: `-t, --target &lt;cursor|claude|both&gt;` (default `both`), `-g, --global` (install to `~/.cursor/skills` and/or `~/.claude/skills`). Copies `skills/gwirian-cli/` to target.
 - **projects list** — List projects (columns: id, name, description).
 - **projects show &lt;project-id&gt;** — Show one project.
+- **projects search &lt;project-id&gt; &lt;query&gt;** — Search within a project for features and scenarios. Option: `--limit &lt;n&gt;` (default 20).
 - **features list &lt;project-id&gt;** — List features (id, title, description).
 - **features show &lt;project-id&gt; &lt;feature-id&gt;** — Show one feature.
 - **features create &lt;project-id&gt;** — Options: `--title`, `--description`, `--tag-list`.
@@ -93,5 +94,5 @@ All list/show/create/update commands respect global `--base-url` and `--json`. W
 
 ## Gwirian API (reminder)
 
-- Base: `GET/POST /api/v1/projects`, `GET /api/v1/projects/:id`; features at `projects/:id/features`; scenarios at `projects/:id/features/:fid/scenarios`; scenario_executions at `.../scenarios/:sid/scenario_executions`.
+- Base: `GET /api/v1/projects`, `GET /api/v1/projects/:id`, `GET /api/v1/projects/:id/search?q=...&limit=...` (optional limit); features at `projects/:id/features`; scenarios at `projects/:id/features/:fid/scenarios`; scenario_executions at `.../scenarios/:sid/scenario_executions`.
 - Auth: `Authorization: Bearer <token>` header (WorkspaceMember token). 401 → token invalid or expired.
