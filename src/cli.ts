@@ -255,7 +255,11 @@ function handleApiError(e: unknown): void {
     printError('Token invalid or expired. Run "gwirian auth" to set a new token.', { title: 'Auth' });
   } else if (e instanceof ApiError) {
     const title = e.statusCode === 404 ? 'Not found' : e.statusCode === 403 ? 'Forbidden' : 'Error';
-    printError(e.message, { title, statusCode: e.statusCode });
+    let msg = e.message;
+    if (e.statusCode === 422 && e.body && typeof e.body === 'object' && e.body !== null && 'errors' in e.body && Array.isArray((e.body as { errors: unknown }).errors)) {
+      msg += '\n' + (e.body as { errors: string[] }).errors.join('\n');
+    }
+    printError(msg, { title, statusCode: e.statusCode });
   } else {
     printError((e as Error).message, { title: 'Error' });
   }
