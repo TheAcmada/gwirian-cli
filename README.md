@@ -145,7 +145,7 @@ gwirian
 |---------|-------------|
 | `gwirian install --skills` | Install gwirian-cli skill for Cursor and/or Claude (use `--target cursor|claude|both`, `--global`) |
 
-**Projects**
+**Projects** (list and show only; no create/update/delete)
 
 - `gwirian projects list`
 - `gwirian projects show <project-id>`
@@ -170,9 +170,11 @@ gwirian
 
 - `gwirian scenario-executions list <project-id> <feature-id> <scenario-id>`
 - `gwirian scenario-executions show <project-id> <feature-id> <scenario-id> <execution-id>`
-- `gwirian scenario-executions create <project-id> <feature-id> <scenario-id> [--status] [--notes] [--executed-at]`
-- `gwirian scenario-executions update ...`
-- `gwirian scenario-executions delete ...`
+- `gwirian scenario-executions create <project-id> <feature-id> <scenario-id>`  
+  Options: `--status`, `--notes`, `--executed-at <iso>` (default: now), `--tag-list <list>` (comma-separated, e.g. `e2e,v1.2.3`)
+- `gwirian scenario-executions update <project-id> <feature-id> <scenario-id> <execution-id>`  
+  Options: `--status`, `--notes`, `--executed-at <iso>`, `--tag-list <list>`
+- `gwirian scenario-executions delete <project-id> <feature-id> <scenario-id> <execution-id>`
 
 **Global options**
 
