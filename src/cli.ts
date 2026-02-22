@@ -437,17 +437,21 @@ program
       .argument('<feature-id>', 'Feature ID')
       .argument('<scenario-id>', 'Scenario ID')
       .option('--status <status>', 'Status')
-      .option('--notes <notes>', 'Notes')
-      .option('--executed-at <iso>', 'Executed at (ISO date)')
-      .option('--tag-list <list>', 'Comma-separated tags (e.g. e2e, v1.2.3, bugfix-123)')
+      .option('--notes <notes>', 'Optional. Notes (recommended when status is failed)')
+      .option('--executed-at <iso>', 'Optional. Executed at (ISO date); defaults to current time if omitted on create')
+      .option('--tag-list <list>', 'Optional. Comma-separated tags (e.g. e2e, v1.2.3, bugfix-123)')
       .action(async (projectId: string, featureId: string, scenarioId: string, opts: CreateScenarioExecutionBody) => {
         const { baseUrl, token } = requireToken(
           (program as unknown as { _baseUrlOverride?: string })._baseUrlOverride
         );
         const useJson = (program as unknown as { _useJson?: boolean })._useJson ?? false;
+        const body: CreateScenarioExecutionBody = {
+          ...opts,
+          executed_at: opts.executed_at ?? new Date().toISOString(),
+        };
         try {
           const api = createApiClient(baseUrl, token);
-          const e = await api.createScenarioExecution(projectId, featureId, scenarioId, opts);
+          const e = await api.createScenarioExecution(projectId, featureId, scenarioId, body);
           output(e, useJson);
         } catch (e) {
           handleApiError(e);
@@ -463,9 +467,9 @@ program
       .argument('<scenario-id>', 'Scenario ID')
       .argument('<execution-id>', 'Execution ID')
       .option('--status <status>', 'Status')
-      .option('--notes <notes>', 'Notes')
-      .option('--executed-at <iso>', 'Executed at (ISO date)')
-      .option('--tag-list <list>', 'Comma-separated tags (e.g. e2e, v1.2.3, bugfix-123)')
+      .option('--notes <notes>', 'Optional. Notes (recommended when status is failed)')
+      .option('--executed-at <iso>', 'Optional. Executed at (ISO date)')
+      .option('--tag-list <list>', 'Optional. Comma-separated tags (e.g. e2e, v1.2.3, bugfix-123)')
       .action(async (projectId: string, featureId: string, scenarioId: string, executionId: string, opts: UpdateScenarioExecutionBody) => {
         const { baseUrl, token } = requireToken(
           (program as unknown as { _baseUrlOverride?: string })._baseUrlOverride
