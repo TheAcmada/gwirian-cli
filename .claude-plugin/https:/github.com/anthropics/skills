@@ -1,0 +1,16 @@
+{
+    "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+    "name": "gwirian-cli",
+    "owner": {
+        "name": "TheAcmada",
+        "url": "https://www.gwirian.com"
+    },
+    "plugins": [
+        {
+            "name": "gwirian-cli",
+            "description": "Gwirian CLI integration for managing Gwirian projects, features, scenarios, and scenario executions.",
+            "source": "./",
+            "homepage": "https://github.com/theacmada/gwirian-cli"
+        }
+    ]
+}
