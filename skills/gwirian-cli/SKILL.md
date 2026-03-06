@@ -1,6 +1,6 @@
 ---
 name: gwirian-cli
-description: Runs and composes commands for the Gwirian CLI (gwirian) to interact with the Gwirian API—list/show/create/update/delete projects, features, scenarios, and scenario executions; configure auth and base URL. Use when the user wants to manage Gwirian data via CLI, create or edit features/scenarios, execute scenarios (with Playwright or similar), or automate Gwirian operations from the terminal.
+description: Runs and composes commands for the Gwirian CLI (gwirian) to interact with the Gwirian API—list/show/create/update/delete projects, features, scenarios, and scenario executions; configure auth and base URL. Use when the user wants to list my projects, list projects, create a scenario, record a test run, configure gwirian, run gwirian command, manage Gwirian data via CLI, create or edit features or scenarios, execute scenarios (with Playwright or similar), or automate Gwirian operations from the terminal.
 ---
 
 # Gwirian CLI skill
@@ -11,16 +11,16 @@ Use the **gwirian** CLI to talk to the Gwirian API from the terminal. This skill
 
 ## When to use
 
-- User wants to **list or show** projects, features, scenarios, or scenario executions from the terminal
-- User wants to **create, update, or delete** a feature, scenario, or scenario execution via CLI
+- User wants to **list or show** projects, features, scenarios, or scenario executions from the terminal (e.g. "list my projects", "show project")
+- User wants to **create, update, or delete** a feature, scenario, or scenario execution via CLI (e.g. "create a scenario", "record a test run")
 - User wants to **execute one or more scenarios** (with Playwright or similar): use the CLI to fetch project/feature/scenario data and to **read project context**; use the other tool to run the tests and the CLI to **record scenario executions**
-- User wants to set or check the API token or base URL for the CLI
-- User says “with the gwirian CLI”, “via gwirian”, “gwirian command”, or similar
+- User wants to set or check the API token or base URL for the CLI ("configure gwirian", "gwirian auth")
+- User says "with the gwirian CLI", "via gwirian", "gwirian command", or similar
 - You need to script or automate Gwirian API calls and the CLI is available
 
 ## How to run the CLI
 
-- **If `gwirian` is on PATH** (after `npm link` or `npm install -g .` from gwirian-cli): run `gwirian <command> ...`.
+- **Prefer `gwirian` on PATH** when available (after `npm link` or `npm install -g .` from gwirian-cli): run `gwirian <command> ...`.
 - **Otherwise** from the gwirian-cli project root: `node dist/cli.js <command> ...` (after `npm run build`) or `npm run dev -- -- <args>` for development.
 - **Non-interactive:** always pass a subcommand (e.g. `projects list`). Without a subcommand and without a TTY, the CLI prints help.
 
@@ -33,7 +33,7 @@ Use `--json` when you need structured output (e.g. to parse project context or I
 ### 1. Configure auth
 
 - First time or missing token: run `gwirian auth` (prompt) or launch `gwirian` with no args in a TUI for setup.
-- Commands that call the API require a configured token; otherwise the CLI reports “No token configured. Run \"gwirian auth\" to set your API token.”
+- Commands that call the API require a configured token; otherwise the CLI reports "No token configured. Run \"gwirian auth\" to set your API token."
 - Do not prompt for the token in chat; point the user to `gwirian auth` or the TUI.
 
 | Task | Command |
@@ -82,7 +82,7 @@ When the user wants to **execute one or more scenarios**:
 
 2. **Resolve features and scenarios** with the CLI (e.g. `features list`, `scenarios list`). Use the project context to select environment and accounts for the run.
 
-3. **Run the actual tests** with the other tool (e.g. Playwright skill or Playwright MCP): navigate to the URLs from context, use accounts from context, perform the steps implied by each scenario’s title/given/when/then.
+3. **Run the actual tests** with the other tool (e.g. Playwright skill or Playwright MCP): navigate to the URLs from context, use accounts from context, perform the steps implied by each scenario's title/given/when/then.
 
 4. **Record each execution** with the CLI:  
    `gwirian scenario-executions create <project-id> <feature-id> <scenario-id> --status passed|failed|pending [--executed-at <ISO>] [--notes "..."] [--tag-list "e2e, v1.2.3"]`  
@@ -131,9 +131,7 @@ gwirian --base-url https://staging.example.com features list 1
 ## Reference
 
 - **Full API reference (all commands and options):** [reference.md](reference.md) in this skill folder.
-- **Implementation and file layout:** gwirian-cli project **AGENTS.md**.
 
 ## Tips
 
 - Prefer running the CLI in the terminal and parsing output; use `--json` when you need structured data (especially project `context`).
-
