@@ -1,137 +1,113 @@
 ---
 name: gwirian-cli
-description: Runs and composes commands for the Gwirian CLI (gwirian) to interact with the Gwirian API—list/show/create/update/delete projects, features, scenarios, and scenario executions; configure auth and base URL. Use when the user wants to list my projects, list projects, create a scenario, record a test run, configure gwirian, run gwirian command, manage Gwirian data via CLI, create or edit features or scenarios, execute scenarios (with Playwright or similar), or automate Gwirian operations from the terminal.
+description: >-
+  Runs gwirian CLI commands to manage projects, features, scenarios,
+  and scenario executions via the Gwirian API. Use when the user wants
+  to list projects, create or update features/scenarios, execute
+  scenarios (e.g. with Playwright), record test results, search project
+  data, or configure gwirian auth/base-url from the terminal.
 ---
 
 # Gwirian CLI skill
 
-Use the **gwirian** CLI to talk to the Gwirian API from the terminal. This skill supports **managing** features and scenarios (create, update, delete), **listing** projects/features/scenarios for context, and **recording** scenario executions when running tests with another tool (e.g. Playwright).
+## Rules
 
-**Rule: when executing scenarios, you must always use the project context.** Before running any scenario (e.g. with Playwright), fetch the project with `gwirian projects show <project-id> --json`, read the **`context`** attribute (environments, URLs, accounts, logins), and use that information to run the tests. Do not execute scenarios without having fetched and applied the project context.
-
-## When to use
-
-- User wants to **list or show** projects, features, scenarios, or scenario executions from the terminal (e.g. "list my projects", "show project")
-- User wants to **create, update, or delete** a feature, scenario, or scenario execution via CLI (e.g. "create a scenario", "record a test run")
-- User wants to **execute one or more scenarios** (with Playwright or similar): use the CLI to fetch project/feature/scenario data and to **read project context**; use the other tool to run the tests and the CLI to **record scenario executions**
-- User wants to set or check the API token or base URL for the CLI ("configure gwirian", "gwirian auth")
-- User says "with the gwirian CLI", "via gwirian", "gwirian command", or similar
-- You need to script or automate Gwirian API calls and the CLI is available
+1. **Project context before executing scenarios.** Before running any scenario (e.g. with Playwright), run `gwirian projects show <project-id> --json`, read the **`context`** attribute (environments, URLs, accounts, logins), and use it to run the tests. Do not execute scenarios without having fetched and applied project context. If context is missing, ask the user for environment URL and test account details or note that context was missing.
+2. **Use `--json` when parsing output** (e.g. to get IDs or `context`).
+3. **Never prompt for the token in chat.** Point the user to `gwirian auth` or to launching `gwirian` with no args in a TTY for the setup TUI.
 
 ## How to run the CLI
 
-- **Prefer `gwirian` on PATH** when available (after `npm link` or `npm install -g .` from gwirian-cli): run `gwirian <command> ...`.
-- **Otherwise** from the gwirian-cli project root: `node dist/cli.js <command> ...` (after `npm run build`) or `npm run dev -- -- <args>` for development.
-- **Non-interactive:** always pass a subcommand (e.g. `projects list`). Without a subcommand and without a TTY, the CLI prints help.
+- Prefer `gwirian` on PATH (after `npm link` or `npm install -g .`). Otherwise from gwirian-cli root: `node dist/cli.js <command> ...` or `npm run dev -- -- <args>`.
+- Non-interactive: always pass a subcommand (e.g. `projects list`). Without a subcommand and without a TTY, the CLI prints help.
+- Install this skill: `gwirian install --skills` (options: `--target cursor|claude|both`, `--global`). See [reference.md](reference.md).
 
-Use `--json` when you need structured output (e.g. to parse project context or IDs).
+## Workflows
 
-**Installing the skill:** After installing the CLI, run `gwirian install --skills` to copy this skill into `.cursor/skills/gwirian-cli` and/or `.claude/skills/gwirian-cli` (so Cursor or Claude Code can use it). Use `--target cursor` or `--target claude` to install for one only; use `--global` to install in your home directory. See the reference for full options.
+### 1. First-time setup
 
-## Task-oriented usage
-
-### 1. Configure auth
-
-- First time or missing token: run `gwirian auth` (prompt) or launch `gwirian` with no args in a TUI for setup.
-- Commands that call the API require a configured token; otherwise the CLI reports "No token configured. Run \"gwirian auth\" to set your API token."
-- Do not prompt for the token in chat; point the user to `gwirian auth` or the TUI.
-
-| Task | Command |
-|------|---------|
-| Set token | `gwirian auth` |
-| Set token and test | `gwirian auth -t` or `gwirian auth --test` |
-| Clear token | `gwirian logout` |
-| Show config | `gwirian config get` |
-| Set base URL | `gwirian config set base-url <url>` |
-
-### 2. List or show projects, features, scenarios
-
-Use these to resolve IDs and to **get project context** before executing scenarios.
-
-| Task | Command |
-|------|---------|
-| List projects | `gwirian projects list` (use `--json` to parse) |
-| Show project (includes context) | `gwirian projects show <project-id>` (use `--json` to read `context`) |
-| Search project (features & scenarios) | `gwirian projects search <project-id> <query>` (optional `--limit <n>`) |
-| List features | `gwirian features list <project-id>` |
-| Show feature | `gwirian features show <project-id> <feature-id>` |
-| List scenarios | `gwirian scenarios list <project-id> <feature-id>` |
-| Show scenario | `gwirian scenarios show <project-id> <feature-id> <scenario-id>` |
-
-### 3. Create or update features and scenarios
-
-| Task | Command |
-|------|---------|
-| Create feature | `gwirian features create <project-id> [--title] [--description] [--tag-list]` |
-| Update feature | `gwirian features update <project-id> <feature-id> [--title] [--description] [--tag-list]` |
-| Delete feature | `gwirian features delete <project-id> <feature-id>` |
-| Create scenario | `gwirian scenarios create <project-id> <feature-id> [--title] [--given] [--when] [--then] [--position]` |
-| Update scenario | `gwirian scenarios update <project-id> <feature-id> <scenario-id> [--title] [--given] [--when] [--then] [--position]` |
-| Delete scenario | `gwirian scenarios delete <project-id> <feature-id> <scenario-id>` |
-
-### 4. Execute scenarios (with Playwright or another tool)
-
-When the user wants to **execute one or more scenarios**:
-
-1. **You must always fetch and use project context.**  
-   Run `gwirian projects show <project-id> --json` and read the **`context`** attribute. Use it for:
-   - **Environments and URLs** — base URL(s) to navigate to (e.g. local, staging, production)
-   - **Accounts** — test users, logins, or magic-link emails to use
-   - Any other hints (roles, feature flags, etc.)  
-   Do not run scenario execution without having read and applied this context. If the project has no `context` or it is empty, ask the user for environment URL and test account details before running tests, or clearly note that context was missing.
-
-2. **Resolve features and scenarios** with the CLI (e.g. `features list`, `scenarios list`). Use the project context to select environment and accounts for the run.
-
-3. **Run the actual tests** with the other tool (e.g. Playwright skill or Playwright MCP): navigate to the URLs from context, use accounts from context, perform the steps implied by each scenario's title/given/when/then.
-
-4. **Record each execution** with the CLI:  
-   `gwirian scenario-executions create <project-id> <feature-id> <scenario-id> --status passed|failed|pending [--executed-at <ISO>] [--notes "..."] [--tag-list "e2e, v1.2.3"]`  
-   Use optional `--tag-list` to record test type (e.g. e2e, smoke), version, bugfix, or other tags.
-
-### 5. List or record scenario executions
-
-| Task | Command |
-|------|---------|
-| List executions for a scenario | `gwirian scenario-executions list <project-id> <feature-id> <scenario-id>` (response includes `tag_list`) |
-| Show one execution | `gwirian scenario-executions show <project-id> <feature-id> <scenario-id> <execution-id>` (response includes `tag_list`) |
-| Create execution (record a run) | `gwirian scenario-executions create <project-id> <feature-id> <scenario-id> [--status] [--notes] [--executed-at] [--tag-list "tags"]` |
-| Update execution | `gwirian scenario-executions update <project-id> <feature-id> <scenario-id> <execution-id> [--status] [--notes] [--executed-at] [--tag-list "tags"]` |
-| Delete execution | `gwirian scenario-executions delete <project-id> <feature-id> <scenario-id> <execution-id>` |
-
-Options: `--status`, `--notes` (optional; **recommended when status is failed** to capture the failure reason), `--executed-at` (optional; defaults to now on create), `--tag-list` (optional). List and show return `tag_list` on each execution.
-
-## Examples
+1. Run `gwirian auth` (or `gwirian auth -t` to set token and test with GET projects).
+2. Optionally set base URL: `gwirian config set base-url <url>`.
+3. Verify: `gwirian config get`; list projects: `gwirian projects list`.
 
 ```bash
-# List projects as JSON (for parsing)
-gwirian --json projects list
+gwirian auth -t
+gwirian config get
+gwirian projects list
+```
 
-# Get project details including context (required before executing scenarios)
+### 2. Explore a project
+
+Use this to resolve IDs and to get project context before executing scenarios.
+
+1. List projects (use `--json` to parse): `gwirian --json projects list`.
+2. Show one project (includes `context`): `gwirian --json projects show <project-id>`.
+3. List features: `gwirian features list <project-id>` (or `--json` to parse).
+4. List scenarios: `gwirian scenarios list <project-id> <feature-id>`.
+5. Search within a project: `gwirian projects search <project-id> <query>` (optional `--limit <n>`).
+
+```bash
+# Resolve project and feature IDs, then list scenarios
+gwirian --json projects list
+gwirian --json projects show 1
+gwirian --json features list 1
+gwirian scenarios list 1 2
+gwirian projects search 1 "login" --limit 10
+```
+
+### 3. Create a feature with scenarios
+
+1. Create the feature: `gwirian features create <project-id> --title "..." [--description "..."] [--tag-list "tags"]`.
+2. If you need the new feature ID in a script, use `--json` on create (or list features and parse).
+3. Create each scenario: `gwirian scenarios create <project-id> <feature-id> --title "..." --given "..." --when "..." --then "..." [--position <n>]`.
+
+```bash
+# Create feature then add scenarios (feature-id 2 used from prior list)
+gwirian features create 1 --title "Login" --description "User can sign in" --tag-list "auth, login"
+gwirian scenarios create 1 2 --title "Successful login" \
+  --given "user has an account" --when "user submits valid credentials" \
+  --then "user is redirected to dashboard"
+gwirian scenarios create 1 2 --title "Invalid password" \
+  --given "user has an account" --when "user submits wrong password" \
+  --then "user sees error message"
+```
+
+### 4. Execute scenarios and record results
+
+When the user wants to execute one or more scenarios (e.g. with Playwright):
+
+1. **Fetch and use project context.** Run `gwirian projects show <project-id> --json` and read `context` (environments/URLs, accounts). Use it for navigation and logins. Do not run tests without it.
+2. Resolve features and scenarios with the CLI (`features list`, `scenarios list`). Use context to choose environment and accounts.
+3. Run the actual tests with the other tool (Playwright etc.): use URLs and accounts from context; perform steps from each scenario's title/given/when/then.
+4. Record each execution: `gwirian scenario-executions create <project-id> <feature-id> <scenario-id> --status passed|failed|pending [--notes "..."] [--tag-list "e2e, v1.2.3"]`. Use `--notes` when status is **failed** to capture the failure reason. Omit `--executed-at` to use current time.
+
+Tags: use `--tag-list` for test type (e2e, smoke), version, or other labels.
+
+```bash
+# 1) Get context (required)
 gwirian --json projects show 1
 
-# Search within a project for features and scenarios
+# 2) After running Playwright (or similar), record results
+gwirian scenario-executions create 1 2 3 --status passed --notes "Playwright E2E" --tag-list "e2e, smoke"
+gwirian scenario-executions create 1 2 4 --status failed --notes "AssertionError: expected 'Dashboard' in title" --tag-list "e2e"
+```
+
+### 5. Search and update existing data
+
+1. Search: `gwirian projects search <project-id> <query>` to find features/scenarios by text.
+2. Show the target resource to confirm IDs: `gwirian features show ...` or `gwirian scenarios show ...`.
+3. Update: `gwirian features update ...` or `gwirian scenarios update ...` or `gwirian scenario-executions update ...` with the desired options. Delete with the corresponding `delete` command.
+
+```bash
+# Find then rename a scenario
 gwirian projects search 1 "login"
+gwirian scenarios show 1 2 3
+gwirian scenarios update 1 2 3 --title "Successful login with email"
 
-# Create a feature
-gwirian features create 1 --title "Login" --description "User can sign in"
-
-# Create a scenario
-gwirian scenarios create 1 2 --title "Successful login" --given "user has an account" --when "user submits valid credentials" --then "user is redirected to dashboard"
-
-# Record a scenario execution (e.g. after Playwright run); omit --executed-at to use current time
-gwirian scenario-executions create 1 2 3 --status passed --notes "Playwright E2E"
-
-# Record a failed run with notes (recommended)
-gwirian scenario-executions create 1 2 3 --status failed --notes "AssertionError: expected 'Dashboard' in title"
-
-# Override base URL for one run
-gwirian --base-url https://staging.example.com features list 1
+# Add tags to an execution
+gwirian scenario-executions update 1 2 3 5 --tag-list "e2e, v1.2.3, smoke"
 ```
 
 ## Reference
 
-- **Full API reference (all commands and options):** [reference.md](reference.md) in this skill folder.
-
-## Tips
-
-- Prefer running the CLI in the terminal and parsing output; use `--json` when you need structured data (especially project `context`).
+Full command and option reference: [reference.md](reference.md) in this skill folder.
